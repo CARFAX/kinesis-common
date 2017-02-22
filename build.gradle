@@ -1,6 +1,13 @@
 group 'com.carfax'
 
-apply plugin: 'java'
+apply plugin: 'groovy'
+apply from: 'http://ia-resolver/artifactory/simple/gradle-scripts/ia-release.gradle'
+
+buildscript {
+    repositories {
+        maven {url "http://ia-resolver/artifactory/repo"}
+    }
+}
 
 sourceCompatibility = 1.8
 
@@ -12,6 +19,5 @@ dependencies {
     compile group: 'com.amazonaws', name: 'amazon-kinesis-client', version: '1.7.3'
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.23'
 
-    testCompile group: 'org.codehaus.groovy', name: 'groovy-all', version: '2.4.8'
     testCompile group: 'org.spockframework', name: 'spock-core', version: '1.0-groovy-2.4'
 }
