@@ -1,13 +1,6 @@
 group 'com.carfax'
 
 apply plugin: 'groovy'
-apply from: 'http://ia-resolver/artifactory/simple/gradle-scripts/ia-release.gradle'
-
-buildscript {
-    repositories {
-        maven {url "http://ia-resolver/artifactory/repo"}
-    }
-}
 
 sourceCompatibility = 1.8
 
