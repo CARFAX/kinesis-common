@@ -13,4 +13,5 @@ dependencies {
     compile group: 'org.slf4j', name: 'slf4j-api', version: '1.7.23'
 
     testCompile group: 'org.spockframework', name: 'spock-core', version: '1.0-groovy-2.4'
+    testCompile group: 'cglib', name: 'cglib', version: '3.2.4'
 }
