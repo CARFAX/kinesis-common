@@ -58,6 +58,21 @@ class TimeIntervalBasedKinesisRecordProcessorSpec extends Specification {
         0 * timeIntervalBasedKinesisRecordProcessor.checkpoint(*_) >> null
     }
 
+    void 'processRecords - Exception'() {
+        given:
+        ProcessRecordsInput processRecordsInput = new ProcessRecordsInput()
+        Exception recordProcessingException = new Exception()
+        1 * timeIntervalBasedKinesisRecordProcessor.delegateProcessor.processRecords(processRecordsInput) >> { throw recordProcessingException }
+
+        when:
+        timeIntervalBasedKinesisRecordProcessor.processRecords(processRecordsInput)
+
+        then:
+        1 * timeIntervalBasedKinesisRecordProcessor.delegateProcessor.handleException(
+                { Exception e -> e.cause.is(recordProcessingException) }
+        )
+    }
+
     void 'shutdown - ZOMBIE'() {
         given:
         ShutdownInput shutdownInput = new ShutdownInput().withShutdownReason(ShutdownReason.ZOMBIE)
