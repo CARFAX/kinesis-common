@@ -4,6 +4,8 @@ import com.amazonaws.services.kinesis.clientlibrary.exceptions.InvalidStateExcep
 import com.amazonaws.services.kinesis.clientlibrary.exceptions.ShutdownException;
 import com.amazonaws.services.kinesis.clientlibrary.exceptions.ThrottlingException;
 import com.amazonaws.services.kinesis.clientlibrary.interfaces.IRecordProcessorCheckpointer;
+import com.amazonaws.services.kinesis.clientlibrary.interfaces.v2.IRecordProcessor;
+import com.amazonaws.services.kinesis.clientlibrary.interfaces.v2.IShutdownNotificationAware;
 import com.amazonaws.services.kinesis.clientlibrary.lib.worker.ShutdownReason;
 import com.amazonaws.services.kinesis.clientlibrary.types.InitializationInput;
 import com.amazonaws.services.kinesis.clientlibrary.types.ProcessRecordsInput;
@@ -11,7 +13,7 @@ import com.amazonaws.services.kinesis.clientlibrary.types.ShutdownInput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class TimeIntervalBasedKinesisRecordProcessor implements ShutdownNotificationAwareRecordProcessor {
+public class TimeIntervalBasedKinesisRecordProcessor implements IRecordProcessor, IShutdownNotificationAware {
 
     private ShutdownNotificationAwareRecordProcessor delegateProcessor;
     private long checkpointIntervalMillis = 60000L;
@@ -28,12 +30,16 @@ public class TimeIntervalBasedKinesisRecordProcessor implements ShutdownNotifica
 
     @Override
     public void processRecords(ProcessRecordsInput processRecordsInput) {
-        delegateProcessor.processRecords(processRecordsInput);
+        try {
+            delegateProcessor.processRecords(processRecordsInput);
 
-        // Checkpoint once every checkpoint interval.
-        if (System.currentTimeMillis() > nextCheckpointTimeInMillis) {
-            checkpoint(processRecordsInput.getCheckpointer());
-            nextCheckpointTimeInMillis = System.currentTimeMillis() + checkpointIntervalMillis;
+            // Checkpoint once every checkpoint interval.
+            if (System.currentTimeMillis() > nextCheckpointTimeInMillis) {
+                checkpoint(processRecordsInput.getCheckpointer());
+                nextCheckpointTimeInMillis = System.currentTimeMillis() + checkpointIntervalMillis;
+            }
+        } catch (Exception e) {
+            delegateProcessor.handleException(e);
         }
     }
 

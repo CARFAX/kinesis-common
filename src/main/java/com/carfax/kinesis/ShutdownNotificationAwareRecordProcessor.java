@@ -4,5 +4,5 @@ import com.amazonaws.services.kinesis.clientlibrary.interfaces.v2.IRecordProcess
 import com.amazonaws.services.kinesis.clientlibrary.interfaces.v2.IShutdownNotificationAware;
 
 public interface ShutdownNotificationAwareRecordProcessor extends IRecordProcessor, IShutdownNotificationAware {
-
+    void handleException(Exception e);
 }
